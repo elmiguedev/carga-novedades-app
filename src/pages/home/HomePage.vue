@@ -46,7 +46,8 @@ export default {
       this.loading = true;
       this.novedades = await NovedadService.obtenerTodo({
         page: params?.page || 0,
-        limit: params?.limit || 10
+        limit: params?.limit || 10,
+        showAnuladas: true
       });
       this.loading = false;
       console.log(this.novedades)

@@ -1,12 +1,12 @@
 <template>
 
-  <v-data-table-server v-model:items-per-page="novedades.limit" @update:options="cargarNovedades" :headers="headers"
-    :items="novedades.items" :loading="loading" :items-length="novedades.total">
+  <v-data-table-server v-model:items-per-page="novedades.limit" :row-props="rowProps" @update:options="cargarNovedades"
+    :headers="headers" :items="novedades.items" :loading="loading" :items-length="novedades.total">
     <template v-slot:item.fecha="{ item }">
       <span>{{ new Date(item.fecha).toLocaleString() }}</span>
     </template>
     <template v-slot:item.actions="{ item }">
-      <v-btn variant="outlined" color="primary" size="small" @click="anular(item)">Anular</v-btn>
+      <v-btn v-if="!item.anulada" variant="outlined" color="primary" size="small" @click="anular(item)">Anular</v-btn>
     </template>
   </v-data-table-server>
 
@@ -39,6 +39,13 @@ export default {
         limit: itemsPerPage,
       })
     },
+    rowProps(props: any) {
+      if (props.item.anulada) {
+        return {
+          class: "text-decoration-line-through text-disabled"
+        }
+      }
+    }
   }
 }
 </script>

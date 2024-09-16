@@ -31,12 +31,12 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  private static saveToken(token: string) {
-    localStorage.setItem("token", token);
+  public static getToken() {
+    return localStorage.getItem("token");
   }
 
-  private static getToken() {
-    return localStorage.getItem("token");
+  private static saveToken(token: string) {
+    localStorage.setItem("token", token);
   }
 
   private static removeToken() {

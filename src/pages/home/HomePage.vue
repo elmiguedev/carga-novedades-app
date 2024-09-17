@@ -9,8 +9,9 @@
       </v-toolbar>
       <h1 class="mb-4">Carga de novedades</h1>
       <BotonNuevaNovedad @submit="guardarNovedad" />
-      <TablaNovedades :novedades="novedades" :loading="loading" @anular="anularNovedad"
-        @cargarNovedades="getNovedades" />
+      <NovedadesFiltros @onFilter="handleFilters" />
+      <TablaNovedades :novedades="novedades" :loading="loading" @onAnular="anularNovedad"
+        @onPaginacion="handlePaginacion" />
     </v-container>
   </v-sheet>
 </template>
@@ -20,21 +21,31 @@ import { AuthService } from '../../core/services/AuthService'
 import { NovedadService } from '../../core/services/NovedadService'
 import TablaNovedades from './components/TablaNovedades.vue'
 import BotonNuevaNovedad from './components/BotonNuevaNovedad.vue'
+import NovedadesFiltros from './components/NovedadesFiltros.vue'
 
 export default {
   components: {
     TablaNovedades,
-    BotonNuevaNovedad
+    BotonNuevaNovedad,
+    NovedadesFiltros
   },
   data() {
     return {
       novedades: {
         items: [],
-        total: 0,
+        limit: 10,
         page: 0,
-        limit: 10
+        total: 0
       },
-      loading: false
+      loading: false,
+      filtros: {
+        search: "",
+        showAnuladas: false,
+      },
+      paginacion: {
+        page: 0,
+        limit: 10,
+      }
     }
   },
   methods: {
@@ -42,15 +53,15 @@ export default {
       AuthService.logout();
       this.$router.push('/login');
     },
-    async getNovedades(params?: any) {
+    async getNovedades() {
       this.loading = true;
       this.novedades = await NovedadService.obtenerTodo({
-        page: params?.page || 0,
-        limit: params?.limit || 10,
-        showAnuladas: true
+        page: this.paginacion.page || 0,
+        limit: this.paginacion.limit || 10,
+        showAnuladas: this.filtros.showAnuladas,
+        search: this.filtros.search,
       });
       this.loading = false;
-      console.log(this.novedades)
     },
     async guardarNovedad(novedad: any) {
       await NovedadService.agregar(novedad);
@@ -63,6 +74,17 @@ export default {
       });
       await this.getNovedades();
     },
+    async handleFilters(filters:any) {
+      this.filtros = filters;
+      await this.getNovedades();
+    },
+    async handlePaginacion(paginacion: any) {
+      this.paginacion = {
+        page: paginacion.page,
+        limit: paginacion.limit
+      };
+      await this.getNovedades();
+    }
   },
 }
 </script>
